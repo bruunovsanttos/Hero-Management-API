@@ -1,0 +1,33 @@
+# Ambiente virtual
+.venv/
+venv/
+
+# Configurações do PyCharm e IntelliJ
+.idea/
+
+# Variáveis de ambiente
+.env
+.env.*
+
+# Arquivos temporários do Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Banco de dados local
+*.db
+*.sqlite
+*.sqlite3
+
+# Pasta criada pelo Flask
+instance/
+
+# Testes
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
