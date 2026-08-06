@@ -2,7 +2,7 @@ from flask import Flask
 
 from config import Config
 
-from .extension import db, jwt, migrate
+from .extensions import db, jwt, migrate
 
 
 def create_app() -> Flask:
@@ -12,6 +12,8 @@ def create_app() -> Flask:
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
+
+    from . import models
 
     @app.get("/health")
     def health_check():
