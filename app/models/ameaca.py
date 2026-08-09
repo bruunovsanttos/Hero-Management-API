@@ -12,5 +12,7 @@ class Ameaca(db.Model):
     longitude = db.Column(db.Numeric(9, 6), nullable=True)
     criado_em = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
 
+    missoes = db.relationship("Missao", back_populates="ameaca")
+
     def __repr__(self) -> str:
         return f"<Ameaca {self.titulo}>"

@@ -22,4 +22,10 @@ class StatusAmeaca(str, Enum):
     EM_ATENTIMENTO = "EM_ATENDIMENTO"
     RESOLVIDA = "RESOLVIDA"
     CANCELADA = "CANCELADA"
-    
+
+class StatusMissao(str, Enum):
+    EM_ANDAMENTO = "EM_ANDAMENTO"
+    CONCLUIDA = "CONCLUIDA"
+    CANCELADA = "CANCELADA"
+        
+
