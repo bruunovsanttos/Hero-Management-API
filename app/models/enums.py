@@ -18,8 +18,8 @@ class NivelAmeaca(str, Enum):
     S = "S"
 
 class StatusAmeaca(str, Enum):
-    REGISTRADA = "RESGISTRADA"
-    EM_ATENTIMENTO = "EM_ATENDIMENTO"
+    REGISTRADA = "REGISTRADA"
+    EM_ATENDIMENTO = "EM_ATENDIMENTO"
     RESOLVIDA = "RESOLVIDA"
     CANCELADA = "CANCELADA"
 
