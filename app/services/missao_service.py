@@ -71,3 +71,23 @@ def finalizar_missao(missao_id):
     db.session.commit()
 
     return missao, None
+
+
+def cancelar_missao(missao_id):
+    missao = Missao.query.get(missao_id)
+
+    if not missao:
+        return None, "Missão não encontrada"
+
+    if missao.status != StatusMissao.EM_ANDAMENTO:
+        return None, "Missão não está em andamento"
+
+    missao.status = StatusMissao.CANCELADA
+    missao.finalizada_em = db.func.now()
+
+    missao.heroi.status = StatusHeroi.DISPONIVEL
+    missao.ameaca.status = StatusAmeaca.REGISTRADA
+
+    db.session.commit()
+
+    return missao, None
