@@ -21,6 +21,16 @@ def criar_missao(heroi_id, ameaca_id):
     if ameaca.status != StatusAmeaca.REGISTRADA:
         return None, "Ameaça não está disponível para atendimento"
 
+    missao_ativa_heroi = Missao.query.filter_by(heroi_id=heroi_id, status=StatusMissao.EM_ANDAMENTO).first()
+
+    if missao_ativa_heroi:
+        return None, "Herói já possui uma missão em andamento"
+
+    missao_ativa_ameaca = Missao.query.filter_by(ameaca_id=ameaca_id, status=StatusMissao.EM_ANDAMENTO).first()
+
+    if missao_ativa_ameaca:
+        return None, "Ameaça já possui uma missão em andamento"
+
     
 
     ordem_rank = {
@@ -42,7 +52,7 @@ def criar_missao(heroi_id, ameaca_id):
 
     missao = Missao(
         heroi_id = heroi_id,
-        ameaca_id = ameaca_id
+        ameaca_id = ameaca_id, status=StatusMissao.EM_ANDAMENTO
     )
 
     heroi.status = StatusHeroi.EM_MISSAO
