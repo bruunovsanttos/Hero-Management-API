@@ -31,7 +31,6 @@ def criar_missao(heroi_id, ameaca_id):
     if missao_ativa_ameaca:
         return None, "Ameaça já possui uma missão em andamento"
 
-    
 
     ordem_rank = {
         RankHeroi.C: 1,
@@ -101,3 +100,24 @@ def cancelar_missao(missao_id):
     db.session.commit()
 
     return missao, None
+
+
+def buscar_missao(missao_id):
+    missao = Missao.query.get(missao_id)
+
+    if not missao:
+        return None, "Missão não encontrada"
+
+    return missao, None
+
+
+def listar_missoes():
+    missoes = Missao.query.all()
+
+    return missoes, None
+
+
+def listar_misoes_em_andamento():
+    missoes = Missao.query.filter_by(status=StatusMissao.EM_ANDAMENTO).all()
+
+    return missoes, None
