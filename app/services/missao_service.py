@@ -121,3 +121,26 @@ def listar_misoes_em_andamento():
     missoes = Missao.query.filter_by(status=StatusMissao.EM_ANDAMENTO).all()
 
     return missoes, None
+
+def listar_missoes_por_status(status):
+    status_validos = [StatusMissao.EM_ANDAMENTO.value, StatusMissao.CONCLUIDA.value, StatusMissao.CANCELADA.value]
+
+    if status not in status_validos:
+        return None, "Status de missão inválido"
+
+    status_missao = StatusMissao(status)
+
+    missoes = Missao.query.filter_by(status=status_missao).all()
+
+    return missoes, None
+
+
+def listar_missoes_por_heroi(heroi_id):
+    heroi = Heroi.query.get(heroi_id)
+
+    if not heroi:
+        return None, "Herói não encontrado"
+
+    missoes = Missao.query.filter_by(heroi_id=heroi_id).all()
+
+    return missoes, None
