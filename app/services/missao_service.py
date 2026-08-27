@@ -156,3 +156,23 @@ def listar_missoes_por_ameaca(ameaca_id):
     missoes = Missao.query.filter_by(ameaca_id=ameaca_id).all()
 
     return missoes, None
+
+def listar_missoes_heroi_por_status(heroi_id, status):
+    heroi = Heroi.query.get(heroi_id)
+
+    if not heroi:
+        return None, "Herói não encontrado"
+
+    status_validos = [
+        StatusMissao.EM_ANDAMENTO.value,
+        StatusMissao.CONCLUIDA.value,
+        StatusMissao.CANCELADA.value
+    ]
+
+    if status not in status_validos:
+        return None, "Status de missao inválido"
+
+    status_missao = StatusMissao(status)
+
+    missoes = Missao.query.filter_by(heroi_id=heroi_id, status=status_missao).all()
+    return missoes, None
