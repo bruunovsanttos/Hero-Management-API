@@ -81,7 +81,6 @@ def finalizar_missao(missao_id):
 
     return missao, None
 
-
 def cancelar_missao(missao_id):
     missao = Missao.query.get(missao_id)
 
@@ -101,7 +100,6 @@ def cancelar_missao(missao_id):
 
     return missao, None
 
-
 def buscar_missao(missao_id):
     missao = Missao.query.get(missao_id)
 
@@ -110,15 +108,8 @@ def buscar_missao(missao_id):
 
     return missao, None
 
-
 def listar_missoes():
     missoes = Missao.query.all()
-
-    return missoes, None
-
-
-def listar_misoes_em_andamento():
-    missoes = Missao.query.filter_by(status=StatusMissao.EM_ANDAMENTO).all()
 
     return missoes, None
 
@@ -134,7 +125,6 @@ def listar_missoes_por_status(status):
 
     return missoes, None
 
-
 def listar_missoes_por_heroi(heroi_id):
     heroi = Heroi.query.get(heroi_id)
 
@@ -144,7 +134,6 @@ def listar_missoes_por_heroi(heroi_id):
     missoes = Missao.query.filter_by(heroi_id=heroi_id).all()
 
     return missoes, None
-
 
 def listar_missoes_por_ameaca(ameaca_id):
 
@@ -170,9 +159,31 @@ def listar_missoes_heroi_por_status(heroi_id, status):
     ]
 
     if status not in status_validos:
-        return None, "Status de missao inválido"
+        return None, "Status de missão inválido"
 
     status_missao = StatusMissao(status)
 
     missoes = Missao.query.filter_by(heroi_id=heroi_id, status=status_missao).all()
     return missoes, None
+
+def listar_missoes_ameaca_por_status(ameaca_id, status):
+    ameaca = Ameaca.query.get(ameaca_id)
+    if not ameaca:
+        return None, "Ameaça não encontrada"
+
+
+    status_validos = [
+        StatusMissao.EM_ANDAMENTO.value,
+        StatusMissao.CONCLUIDA.value,
+        StatusMissao.CANCELADA.value
+     ]
+
+    if status not in status_validos:
+        return None, "Status de missão inválido"
+
+    status_missao = StatusMissao(status)
+
+    missoes = Missao.query.filter_by(ameaca_id=ameaca_id, status=status_missao).all()
+    return missoes, None
+
+
