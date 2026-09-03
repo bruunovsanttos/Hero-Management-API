@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.services.missao_service import criar_missao, buscar_missao
+from app.services.missao_service import criar_missao, buscar_missao, listar_missoes, listar_missoes_por_status
 
 
 missao_bp = Blueprint("missoes", __name__)
@@ -37,3 +37,40 @@ def buscar(missao_id):
         "status": missao.status.value
     }), 200
 
+@missao_bp.route("/missoes", methods=["GET"])
+def listar():
+    missoes, erro = listar_missoes
+
+    if erro:
+        return jsonify(({"erro": erro})), 400
+
+    resultado = []
+
+    for missao in missoes:
+        resultado.append({
+        "id": missao.id,
+        "heroi_id": missao.heroi_id,
+        "ameaca_id": missao.ameaca_id,
+        "status": missao.status.value
+    })
+
+    return jsonify(resultado), 200
+
+@missao_bp.route("/missoes/status/<status>", methods=["GET"])
+def listar_por_status(status):
+    missoes_por_status, erro = listar_missoes_por_status(status)
+
+    if erro:
+        return jsonify(({"erro": erro})), 400
+
+    resultado = []
+
+    for missao in missoes_por_status:
+        resultado.append({
+            "id": missao.id,
+            "heroi_id": missao.heroi_id,
+            "ameaca_id": missao.ameaca_id,
+            "status": missao.status.value
+        })
+
+    return jsonify(missoes_por_status), 200
