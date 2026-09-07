@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.services.missao_service import criar_missao, buscar_missao, listar_missoes, listar_missoes_por_status
+from app.services.missao_service import criar_missao, buscar_missao, listar_missoes, listar_missoes_por_status, listar_missoes_por_heroi, listar_missoes_por_ameaca
 
 
 missao_bp = Blueprint("missoes", __name__)
@@ -74,3 +74,41 @@ def listar_por_status(status):
         })
 
     return jsonify(missoes_por_status), 200
+
+@missao_bp.route("/missoes/heroi/<int:heroi_id>", methods=["GET"])
+def listar_por_heroi(heroi_id):
+    missoes_por_heroi, erro = listar_missoes_por_heroi(heroi_id)
+
+    if erro:
+        return jsonify({"erro": erro}), 404
+
+    resultado = []
+
+    for missao in missoes_por_heroi:
+        resultado.append({
+            "id": missao.id,
+            "heroi_id": missao.heroi_id,
+            "ameaca_id": missao.ameaca_id,
+            "status": missao.status.value
+        })
+    return jsonify(missoes_por_heroi), 200
+
+@missao_bp.route("/missoes/ameaca/<int:ameaca_id>", methods=["GET"])
+def listar_por_ameaca(ameaca_id):
+    missoes_por_ameaca, erro = listar_missoes_por_ameaca(ameaca_id)
+
+    if erro:
+        return jsonify({"erro": erro}), 404
+
+    resultado = []
+
+    for missao in missoes_por_ameaca:
+        resultado.append({
+            "id": missao.id,
+            "heroi_id": missao.heroi_id,
+            "ameaca_id": missao.ameaca_id,
+            "status": missao.status.value
+        })
+    return jsonify(missoes_por_ameaca), 200
+
+

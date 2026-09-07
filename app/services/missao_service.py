@@ -104,8 +104,10 @@ def buscar_missao(missao_id):
         return None, "Missão não encontrada"
 
     return missao, None
-def listar_missoes():
-    missoes = Missao.query.all()
+def listar_missoes(page=1, per_page=10):
+    paginacao = Missao.query.paginate(page=page, per_page=per_page, error_out=False)
+
+    missoes = paginacao.itens
 
     return missoes, None
 def listar_missoes_por_status(status):
