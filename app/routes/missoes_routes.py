@@ -39,7 +39,11 @@ def buscar(missao_id):
 
 @missao_bp.route("/missoes", methods=["GET"])
 def listar():
-    missoes, erro = listar_missoes
+
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 10, type=int)
+
+    missoes, erro = listar_missoes(page=page, per_page=per_page)
 
     if erro:
         return jsonify(({"erro": erro})), 400
