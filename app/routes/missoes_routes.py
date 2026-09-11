@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.services.missao_service import criar_missao, buscar_missao, listar_missoes, listar_missoes_por_status, listar_missoes_por_heroi, listar_missoes_por_ameaca
+from app.services.missao_service import criar_missao, buscar_missao, listar_missoes, listar_missoes_por_status, listar_missoes_por_heroi, listar_missoes_por_ameaca, finalizar_missao, cancelar_missao
 
 
 missao_bp = Blueprint("missoes", __name__)
@@ -115,4 +115,33 @@ def listar_por_ameaca(ameaca_id):
         })
     return jsonify(missoes_por_ameaca), 200
 
+@missao_bp.route("/missoes/<int:missao_id>/finalizar", methods=["PATCH"])
+def finalizar(missao_id):
+
+    missao, erro = finalizar_missao(missao_id)
+
+    if erro:
+        return jsonify({"erro": erro}), 400
+
+    return jsonify({
+            "id": missao.id,
+            "heroi_id": missao.heroi_id,
+            "ameaca_id": missao.ameaca_id,
+            "status": missao.status.value
+        }), 200
+
+@missao_bp.route("/missoes/<int:missao_id>/cancelar", methods=["PATCH"])
+def cancelar(missao_id):
+
+    missao, erro = cancelar_missao(missao_id)
+
+    if erro:
+        return jsonify({"erro": erro}), 400
+
+    return jsonify({
+            "id": missao.id,
+            "heroi_id": missao.heroi_id,
+            "ameaca_id": missao.ameaca_id,
+            "status": missao.status.value
+        }), 200
 
