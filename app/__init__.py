@@ -1,9 +1,6 @@
 from flask import Flask
-
 from config import Config
-
 from .extensions import db, jwt, migrate
-
 
 def create_app() -> Flask:
     app = Flask(__name__)
@@ -14,6 +11,9 @@ def create_app() -> Flask:
     jwt.init_app(app)
 
     from . import models
+    from .routes.missoes_routes import missao_bp
+
+    app.register_blueprint(missao_bp)
 
     @app.get("/health")
     def health_check():

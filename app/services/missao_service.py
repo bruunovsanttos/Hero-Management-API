@@ -107,7 +107,7 @@ def buscar_missao(missao_id):
 def listar_missoes(page=1, per_page=10):
     paginacao = Missao.query.paginate(page=page, per_page=per_page, error_out=False)
 
-    missoes = paginacao.itens
+    missoes = paginacao.items
 
     return missoes, None
 def listar_missoes_por_status(status):

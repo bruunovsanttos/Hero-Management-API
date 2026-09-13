@@ -8,20 +8,33 @@ missao_bp = Blueprint("missoes", __name__)
 def criar():
     dados = request.get_json()
 
+    if not dados:
+        return jsonify({
+            "erro": "Dados da missão não informados"
+        }), 400
+
     heroi_id = dados.get("heroi_id")
     ameaca_id = dados.get("ameaca_id")
 
+    if not heroi_id or not ameaca_id:
+        return jsonify({
+            "erro": "heroi_id e ameaca_id são obrigatórios"
+        }), 400
+
     missao, erro = criar_missao(heroi_id, ameaca_id)
 
-    if erro:
+    if erro in ["Herói não encontrado", "Ameaça não encontrada"]:
         return jsonify({"erro": erro}), 404
+
+    if erro:
+        return jsonify({"erro": erro}), 409
 
     return jsonify({
         "id":missao.id,
         "heroi_id":missao.heroi_id,
         "ameaca_id":missao.ameaca_id,
         "status":missao.status.value
-    }), 200
+    }), 201
 
 @missao_bp.route("/missoes/<int:missao_id>", methods=["GET"])
 def buscar(missao_id):
@@ -46,7 +59,7 @@ def listar():
     missoes, erro = listar_missoes(page=page, per_page=per_page)
 
     if erro:
-        return jsonify(({"erro": erro})), 400
+        return jsonify({"erro": erro}), 400
 
     resultado = []
 
@@ -65,7 +78,7 @@ def listar_por_status(status):
     missoes_por_status, erro = listar_missoes_por_status(status)
 
     if erro:
-        return jsonify(({"erro": erro})), 400
+        return jsonify({"erro": erro}), 400
 
     resultado = []
 
@@ -77,7 +90,7 @@ def listar_por_status(status):
             "status": missao.status.value
         })
 
-    return jsonify(missoes_por_status), 200
+    return jsonify(resultado), 200
 
 @missao_bp.route("/missoes/heroi/<int:heroi_id>", methods=["GET"])
 def listar_por_heroi(heroi_id):
@@ -95,7 +108,7 @@ def listar_por_heroi(heroi_id):
             "ameaca_id": missao.ameaca_id,
             "status": missao.status.value
         })
-    return jsonify(missoes_por_heroi), 200
+    return jsonify(resultado), 200
 
 @missao_bp.route("/missoes/ameaca/<int:ameaca_id>", methods=["GET"])
 def listar_por_ameaca(ameaca_id):
@@ -113,15 +126,18 @@ def listar_por_ameaca(ameaca_id):
             "ameaca_id": missao.ameaca_id,
             "status": missao.status.value
         })
-    return jsonify(missoes_por_ameaca), 200
+    return jsonify(resultado), 200
 
 @missao_bp.route("/missoes/<int:missao_id>/finalizar", methods=["PATCH"])
 def finalizar(missao_id):
 
     missao, erro = finalizar_missao(missao_id)
 
-    if erro:
-        return jsonify({"erro": erro}), 400
+    if erro == "Missão não encontrada":
+        return jsonify({"erro": erro}), 404
+
+    if erro == "Missão não está em andamento":
+        return jsonify({"erro": erro}), 409
 
     return jsonify({
             "id": missao.id,
@@ -135,8 +151,11 @@ def cancelar(missao_id):
 
     missao, erro = cancelar_missao(missao_id)
 
-    if erro:
-        return jsonify({"erro": erro}), 400
+    if erro == "Missão não encontrada":
+        return jsonify({"erro": erro}), 404
+
+    if erro == "Missão não está em andamento":
+        return jsonify({"erro": erro}), 409
 
     return jsonify({
             "id": missao.id,
