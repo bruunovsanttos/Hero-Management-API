@@ -12,8 +12,10 @@ def create_app() -> Flask:
 
     from . import models
     from .routes.missoes_routes import missao_bp
+    from .routes.auth_routes import auth_bp
 
     app.register_blueprint(missao_bp)
+    app.register_blueprint(auth_bp)
 
     @app.get("/health")
     def health_check():
