@@ -10,7 +10,7 @@ missao_bp = Blueprint("missoes", __name__)
 def criar():
     dados = request.get_json()
 
-    if not dados:
+    if not isinstance(dados, dict) or not dados:
         return jsonify({
             "erro": "Dados da missão não informados"
         }), 400
