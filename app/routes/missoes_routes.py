@@ -1,10 +1,12 @@
 from flask import Blueprint, request, jsonify
 from app.services.missao_service import criar_missao, buscar_missao, listar_missoes, listar_missoes_por_status, listar_missoes_por_heroi, listar_missoes_por_ameaca, finalizar_missao, cancelar_missao
+from flask_jwt_extended import jwt_required
 
 
 missao_bp = Blueprint("missoes", __name__)
 
 @missao_bp.route("/missoes", methods=["POST"])
+@jwt_required()
 def criar():
     dados = request.get_json()
 
@@ -37,6 +39,7 @@ def criar():
     }), 201
 
 @missao_bp.route("/missoes/<int:missao_id>", methods=["GET"])
+@jwt_required()
 def buscar(missao_id):
     missao, erro = buscar_missao(missao_id)
 
@@ -74,6 +77,7 @@ def listar():
     return jsonify(resultado), 200
 
 @missao_bp.route("/missoes/status/<status>", methods=["GET"])
+@jwt_required()
 def listar_por_status(status):
     missoes_por_status, erro = listar_missoes_por_status(status)
 
@@ -93,6 +97,7 @@ def listar_por_status(status):
     return jsonify(resultado), 200
 
 @missao_bp.route("/missoes/heroi/<int:heroi_id>", methods=["GET"])
+@jwt_required()
 def listar_por_heroi(heroi_id):
     missoes_por_heroi, erro = listar_missoes_por_heroi(heroi_id)
 
@@ -111,6 +116,7 @@ def listar_por_heroi(heroi_id):
     return jsonify(resultado), 200
 
 @missao_bp.route("/missoes/ameaca/<int:ameaca_id>", methods=["GET"])
+@jwt_required()
 def listar_por_ameaca(ameaca_id):
     missoes_por_ameaca, erro = listar_missoes_por_ameaca(ameaca_id)
 
@@ -129,6 +135,7 @@ def listar_por_ameaca(ameaca_id):
     return jsonify(resultado), 200
 
 @missao_bp.route("/missoes/<int:missao_id>/finalizar", methods=["PATCH"])
+@jwt_required()
 def finalizar(missao_id):
 
     missao, erro = finalizar_missao(missao_id)
@@ -147,6 +154,7 @@ def finalizar(missao_id):
         }), 200
 
 @missao_bp.route("/missoes/<int:missao_id>/cancelar", methods=["PATCH"])
+@jwt_required()
 def cancelar(missao_id):
 
     missao, erro = cancelar_missao(missao_id)
