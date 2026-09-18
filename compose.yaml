@@ -1,0 +1,15 @@
+services:
+  api:
+    build: .
+    image: hero-management-api:v1
+    ports:
+      - "127.0.0.1:5001:5000"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: sqlite:////app/instance/hero_management.db
+    volumes:
+      - dados_api:/app/instance
+
+volumes:
+  dados_api:
