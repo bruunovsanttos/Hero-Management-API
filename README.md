@@ -1,12 +1,12 @@
 # Hero Management API
 
-API REST para gerenciamento de heróis, ameaças e missões, desenvolvida com Python e Flask como parte do desafio **100 Dias de Código**.
+API REST para gerenciamento de heróis, ameaças e missões, desenvolvida com Python e Flask.
 
 O projeto tem como objetivo aplicar conceitos de desenvolvimento backend através de regras de negócio, relacionamentos entre entidades, gerenciamento de estados e consultas utilizando SQLAlchemy.
 
-> 🚧 Projeto em desenvolvimento.
->
-> As rotas de missões, o cadastro e login de usuários e a proteção com JWT já estão implementados. No Dia 50, foram concluídos os testes de integração e a atualização da documentação.
+> A V1 possui autenticação JWT, gerenciamento de missões e execução com Docker e Gunicorn. A API está publicada no Render, com PostgreSQL em produção.
+
+API pública: [https://hero-management-api.onrender.com](https://hero-management-api.onrender.com).
 
 ---
 
@@ -27,9 +27,13 @@ O projeto está sendo desenvolvido com foco no entendimento das regras de negóc
 - Flask-SQLAlchemy
 - SQLAlchemy
 - Flask-JWT-Extended
-- Flask-Migrate
+- Flask-Migrate / Alembic
 - python-dotenv
-- SQLite durante o desenvolvimento
+- SQLite no desenvolvimento local e no Docker Compose
+- PostgreSQL em produção, com Psycopg 3 (psycopg[binary])
+- Docker / Docker Compose
+- Gunicorn
+- Render
 
 ---
 
@@ -214,8 +218,10 @@ app/
 ├── extensions.py
 └── __init__.py
 migrations/
-tests/
-docs/
+.env.example
+.dockerignore
+Dockerfile
+compose.yaml
 config.py
 requirements.txt
 run.py
@@ -245,7 +251,7 @@ Exige objeto JSON não vazio e campos textuais. Nome e email têm espaços exter
 {"email":"pessoa@example.com","senha":"uma-senha-de-exemplo"}
 ```
 
-Resposta `200`: `{"access_token":"<JWT>"}`. Email é normalizado como no cadastro. Entrada inválida retorna `400`; credenciais incorretas retornam `401` com `{"erro":"Email ou senha inválidos"}`.
+Resposta `200`: `{"access_token":"<JWT>"}`. Email tem espaços externos removidos e é convertido para minúsculas. Entrada inválida retorna `400`; credenciais incorretas retornam `401` com `{"erro":"Email ou senha inválidos"}`.
 
 Envie o token nas rotas privadas:
 
@@ -344,7 +350,29 @@ Erros gerados pelo Flask podem vir em HTML: por exemplo, JSON sintaticamente inv
 
 ## 🚀 Como executar o projeto
 
-No PowerShell, na pasta do projeto:
+### Variáveis de ambiente
+
+O arquivo `.env.example` contém o modelo de configuração. No PowerShell, copie-o apenas se ainda não tiver um `.env`:
+
+```powershell
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+```
+
+Preencha o `.env` com os valores do seu ambiente antes de iniciar a aplicação:
+
+| Variável | Uso |
+|---|---|
+| `SECRET_KEY` | Chave da aplicação Flask. Obrigatória; a aplicação não inicia se estiver ausente ou vazia. |
+| `JWT_SECRET_KEY` | Chave usada para assinar os tokens JWT. Obrigatória; a aplicação não inicia se estiver ausente ou vazia. Use uma chave aleatória de pelo menos 32 bytes. |
+| `DATABASE_URL` | URI de conexão com o banco. Na ausência da variável, usa `sqlite:///hero_management.db`. Em produção, configure a conexão PostgreSQL do ambiente. |
+
+O `python-dotenv` carrega o `.env`. O arquivo local é ignorado pelo Git; `.env.example` é o modelo versionável. Mantenha nele apenas exemplos, sem chaves reais ou credenciais. No Render, configure os valores nas variáveis de ambiente do serviço.
+
+O `config.py` converte URIs iniciadas por `postgresql://` para `postgresql+psycopg://`, selecionando Psycopg 3. URIs já iniciadas por `postgresql+psycopg://` são mantidas. O prefixo `postgres://` não é convertido pela configuração atual.
+
+### Execução local
+
+No PowerShell, na pasta do projeto, com Python instalado:
 
 ```powershell
 python -m venv .venv
@@ -352,48 +380,101 @@ python -m venv .venv
 python -m pip install -r requirements.txt
 ```
 
-Crie um arquivo `.env` local (ignorado pelo Git), por exemplo:
-
-```dotenv
-SECRET_KEY=substitua-por-uma-chave-aleatoria
-JWT_SECRET_KEY=substitua-por-uma-chave-aleatoria-de-pelo-menos-32-bytes
-DATABASE_URL=sqlite:///hero_management.db
-```
+Após configurar o `.env`, use `DATABASE_URL=sqlite:///hero_management.db` para SQLite local e aplique as migrations:
 
 ```powershell
 python -m flask --app run db upgrade
 python run.py
 ```
 
-Servidor de desenvolvimento: `http://127.0.0.1:5000`. `run.py` habilita debug; essa execução é destinada ao desenvolvimento. A URI SQLite relativa aponta para a pasta `instance/`. Sem variáveis, `config.py` fornece chaves de desenvolvimento e a URI SQLite padrão. Não use essas chaves como configuração de produção.
+Servidor de desenvolvimento: `http://127.0.0.1:5000`. `run.py` habilita debug; essa execução é destinada ao desenvolvimento. A URI SQLite relativa aponta para a pasta `instance/`.
 
-Verificação: `GET /health` retorna `200` com `{"message":"Hero Management API funcionando","status":"online"}`.
+### Execução com Docker Compose
 
----
-
-## 🧪 Testes realizados
-
-Executados por HTTP real no servidor local, com fixtures exclusivas no banco configurado. Resultado final: **82 verificações aprovadas, zero falhas**. O [relatório do Dia 50](docs/dia50-relatorio.md) detalha os testes, a correção da validação do corpo JSON na criação de missão e a confirmação dos resultados.
-
-Cobertura: sete rotas privadas com token ausente, malformado, assinatura inválida e expirado; acesso público; cadastro/login/me; consultas autenticadas; POST e PATCH autenticados; conflitos de negócio; erros de recursos; paginação; estados persistidos e limpeza de fixtures. Tokens não são gravados no relatório.
-
-Com o servidor ativo, execute a partir da raiz do projeto:
+Com Docker e Docker Compose disponíveis e o `.env` configurado:
 
 ```powershell
-python tests/test_dia50.py . docs/dia50-resultados.json
+docker compose build
+docker compose run --rm api python -m flask --app run db upgrade
+docker compose up -d
 ```
 
-O teste usa `http://127.0.0.1:5000` e a configuração local para acessar o mesmo banco. Cria e remove seus próprios registros; execute em ambiente de desenvolvimento sem outras operações concorrentes. O token expirado é gerado com a configuração da aplicação e enviado ao servidor, sem esperar a expiração de um login. O script reporta contagens e detalhes no JSON; confira `passed` em cada registro.
+A API fica disponível em `http://127.0.0.1:5001`. O `Dockerfile` usa Python 3.12 e inicia `gunicorn --bind 0.0.0.0:5000 run:app`. O Compose publica a porta 5000 do contêiner na porta 5001, acessível apenas pela interface local.
+
+O serviço `api` carrega as chaves do `.env`, mas sobrescreve `DATABASE_URL` com `sqlite:////app/instance/hero_management.db`. O volume nomeado `dados_api` persiste o banco em `/app/instance`. O Compose atual não define um serviço PostgreSQL.
+
+Para acompanhar a aplicação e encerrá-la:
+
+```powershell
+docker compose logs -f api
+docker compose down
+```
+
+O comando `down` preserva o volume; a opção `-v` remove o volume e seus dados. O `.dockerignore` exclui arquivos de ambiente, bancos locais e o ambiente virtual da imagem.
+
+### Migrations
+
+Flask-Migrate integra o Alembic à aplicação. As revisões existentes em `migrations/` definem as tabelas de heróis, ameaças, missões e usuários. Aplique-as no banco selecionado por `DATABASE_URL`:
+
+```powershell
+python -m flask --app run db upgrade
+python -m flask --app run db current
+```
+
+No Compose, com a API em execução:
+
+```powershell
+docker compose exec api python -m flask --app run db upgrade
+docker compose exec api python -m flask --app run db current
+```
+
+Ao alterar modelos durante o desenvolvimento, gere uma revisão, confira o arquivo gerado e aplique-a:
+
+```powershell
+python -m flask --app run db migrate -m "descreve a alteracao do esquema"
+python -m flask --app run db upgrade
+```
+
+O diretório de migrations já existe; não é necessário executar `db init`. A inicialização da aplicação e o comando padrão do Docker não executam migrations automaticamente.
+
+### Produção no Render
+
+A API está publicada em [https://hero-management-api.onrender.com](https://hero-management-api.onrender.com), usando PostgreSQL com Psycopg 3 em produção.
+
+A configuração de produção usa `SECRET_KEY`, `JWT_SECRET_KEY` e `DATABASE_URL` nas variáveis de ambiente do serviço. O Gunicorn carrega a aplicação por `run:app`; a imagem Docker escuta em `0.0.0.0:5000`. Configure `/health` como caminho de verificação de saúde do serviço.
+
+As migrations devem ser aplicadas ao banco de produção com `python -m flask --app run db upgrade`, em um ambiente com acesso ao banco e às variáveis do serviço. O repositório não contém `render.yaml` nem uma etapa automática de migrations no `Dockerfile`; os ajustes do serviço no painel do Render não são definidos por esses arquivos.
 
 ---
 
-## 🔜 Próximas etapas
+## 🧪 Verificação da aplicação
 
-### Melhorias planejadas para a V2
+O endpoint público `GET /health` retorna `200` com:
 
-- Autorização por roles/tipo de usuário, com permissões por operação.
-- Refinar paginação: limite explícito de `per_page`, validação uniforme, ordenação estável, metadados e avaliação dos filtros.
-- Refinar validação de tipos dos IDs e padronização de erros HTTP/JSON.
-- Avaliar ciclo de vida dos tokens e comportamento para usuários removidos.
+```json
+{"message":"Hero Management API funcionando","status":"online"}
+```
 
-Docker e deploy ficam para etapas posteriores ao fechamento de testes e documentação do Dia 50.
+No PowerShell:
+
+```powershell
+# Execução local
+Invoke-RestMethod http://127.0.0.1:5000/health
+
+# Docker Compose
+Invoke-RestMethod http://127.0.0.1:5001/health
+
+# Produção
+Invoke-RestMethod https://hero-management-api.onrender.com/health
+```
+
+Essa rota confirma que a aplicação responde, mas não consulta o banco de dados. A cópia atual do projeto não contém uma suíte em `tests/` nem relatórios em `docs/`.
+
+---
+
+## 📌 Limitações atuais
+
+- As rotas protegidas exigem JWT, sem autorização por perfil ou propriedade da missão.
+- A paginação não define limite próprio, ordenação explícita ou metadados; os filtros não são paginados.
+- Os IDs recebidos no corpo de criação de missão não possuem validação explícita de tipo, e os erros HTTP não são todos padronizados em JSON.
+- Não há refresh ou revogação de tokens. As rotas de missões não verificam se o usuário do token ainda existe; `/auth/me` faz essa consulta.
