@@ -52,7 +52,7 @@ def login():
 @auth_bp.route("/auth/me", methods=["GET"])
 @jwt_required()
 def usuario_atual():
-    usuario_id = get_jwt_identity()
+    usuario_id = int(get_jwt_identity())
 
     usuario, erro= buscar_usuario_autenticado(usuario_id)
 
