@@ -1,6 +1,36 @@
+import { useState } from "react";
 import "./Login.css";
 
 function Login() {
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+
+  const handleSubmit = async (event) => {
+  event.preventDefault();
+
+  try {
+    const response = await fetch(
+      "https://hero-management-api.onrender.com/auth/login",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          senha,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    console.log(data);
+  } catch (error) {
+    console.error("Erro ao realizar login:", error);
+  }
+};
+
   return (
     <main className="login-page">
       <section className="login-card">
@@ -14,7 +44,7 @@ function Login() {
           </p>
         </div>
 
-        <form className="login-form">
+        <form className="login-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="email">E-mail</label>
 
@@ -22,6 +52,8 @@ function Login() {
               type="email"
               id="email"
               placeholder="Digite seu e-mail"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
             />
           </div>
 
@@ -32,6 +64,8 @@ function Login() {
               type="password"
               id="senha"
               placeholder="Digite sua senha"
+              value={senha}
+              onChange={(event) => setSenha(event.target.value)}
             />
           </div>
 
