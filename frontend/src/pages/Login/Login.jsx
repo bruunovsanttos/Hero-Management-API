@@ -6,30 +6,51 @@ function Login() {
   const [senha, setSenha] = useState("");
 
   const handleSubmit = async (event) => {
-  event.preventDefault();
+    event.preventDefault();
 
-  try {
-    const response = await fetch(
-      "https://hero-management-api.onrender.com/auth/login",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          senha,
-        }),
+    try {
+      const response = await fetch(
+        "https://hero-management-api.onrender.com/auth/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            senha,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("Erro no login:", data);
+        return;
       }
-    );
 
-    const data = await response.json();
+      localStorage.setItem("access_token", data.access_token);
 
-    console.log(data);
-  } catch (error) {
-    console.error("Erro ao realizar login:", error);
-  }
-};
+      console.log("Login realizado com sucesso!");
+
+      const usuarioResponse = await fetch(
+        "https://hero-management-api.onrender.com/auth/me",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${data.access_token}`,
+          },
+        }
+      );
+
+      const usuario = await usuarioResponse.json();
+
+      console.log("Usuário autenticado:", usuario);
+    } catch (error) {
+      console.error("Erro ao realizar login:", error);
+    }
+  };
 
   return (
     <main className="login-page">
