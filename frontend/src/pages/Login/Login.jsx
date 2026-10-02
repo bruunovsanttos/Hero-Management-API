@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -47,6 +50,10 @@ function Login() {
       const usuario = await usuarioResponse.json();
 
       console.log("Usuário autenticado:", usuario);
+
+      navigate("/dashboard");
+
+
     } catch (error) {
       console.error("Erro ao realizar login:", error);
     }
