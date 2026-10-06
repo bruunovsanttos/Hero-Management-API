@@ -1,0 +1,95 @@
+.herois-page {
+  min-height: 100vh;
+  background: #0d0d0d;
+  color: #f5f5f5;
+}
+
+.herois-header {
+  padding: 32px 7%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  border-bottom: 1px solid #2b2b2b;
+  background: #151515;
+}
+
+.herois-badge,
+.herois-title span {
+  color: #f2c200;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.herois-header h1 {
+  margin: 8px 0;
+  font-size: 32px;
+}
+
+.herois-header p {
+  margin: 0;
+  color: #999;
+}
+
+.voltar-button {
+  padding: 11px 24px;
+  border: 1px solid #3b3b3b;
+  border-radius: 8px;
+  background: transparent;
+  color: #f5f5f5;
+  cursor: pointer;
+}
+
+.herois-content {
+  width: min(1100px, 86%);
+  margin: 0 auto;
+  padding: 55px 0;
+}
+
+.herois-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+.herois-title h2 {
+  margin: 6px 0 0;
+  font-size: 28px;
+}
+
+.novo-heroi-button {
+  padding: 12px 20px;
+  border: 0;
+  border-radius: 8px;
+  background: #f2c200;
+  color: #090909;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.herois-empty {
+  padding: 60px 30px;
+  text-align: center;
+  border: 1px solid #2c2c2c;
+  border-radius: 14px;
+  background: #151515;
+}
+
+.herois-empty h3 {
+  margin-bottom: 8px;
+}
+
+.herois-empty p {
+  color: #999;
+}
+
+@media (max-width: 700px) {
+  .herois-header,
+  .herois-title {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

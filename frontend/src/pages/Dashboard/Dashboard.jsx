@@ -1,6 +1,14 @@
+import { useNavigate } from "react-router-dom";
 import "./Dashboard.css";
 
 function Dashboard() {
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    navigate("/login");
+};
   return (
     <main className="dashboard-page">
       <header className="dashboard-header">
@@ -10,8 +18,11 @@ function Dashboard() {
           <p>Gerencie heróis, ameaças e missões em um só lugar.</p>
         </div>
 
-        <button className="logout-button">
-          Sair
+        <button
+        className="logout-button"
+        onClick={handleLogout}
+        >
+        Sair
         </button>
       </header>
 
@@ -36,7 +47,7 @@ function Dashboard() {
               </p>
             </div>
 
-            <button>Gerenciar heróis</button>
+            <button onClick={() => navigate("/herois")}>Gerenciar heróis</button>
           </article>
 
           <article className="dashboard-card">
